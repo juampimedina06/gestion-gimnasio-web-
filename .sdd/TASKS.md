@@ -9,7 +9,7 @@
   - Definición de interfaces TypeScript para todos los DTOs.
   - Instancia de Axios configurada con base URL y manejo de errores.
 
-- [ ] **Ticket 3:** `feat(auth): login authentication flow and zustand store`
+- [x] **Ticket 3:** `feat(auth): login authentication flow and zustand store`
   - Implementación de `useAuthStore` con Zustand y persistencia.
   - Pantalla `LoginScreen` con validación Zod y conexión a `POST /admin/login`.
   - Componentes `ProtectedRoute` y guards de rol.
