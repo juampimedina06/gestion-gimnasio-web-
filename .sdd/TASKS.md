@@ -38,6 +38,6 @@
   - Vista `PersonalTrainersScreen` protegida exclusivamente para `Admin`.
   - Formulario de alta para `POST /admin/registro-usuario`.
 
-- [ ] **Ticket 10:** `feat(dashboard): analytics summary metrics and final verification`
+- [x] **Ticket 10:** `feat(dashboard): analytics summary metrics and final verification`
   - `DashboardScreen` con estadísticas del gimnasio, accesos rápidos y estado del sistema.
   - Verificación final de build y tipado.
