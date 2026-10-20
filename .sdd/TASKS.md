@@ -34,7 +34,7 @@
   - Modal `RenovarPagoModal` conectado a `POST /cliente/actualizar`.
   - Renovación de plan y método de pago con validación de estado previo.
 
-- [ ] **Ticket 9:** `feat(usuarios): personal trainer management screen for admin`
+- [x] **Ticket 9:** `feat(usuarios): personal trainer management screen for admin`
   - Vista `PersonalTrainersScreen` protegida exclusivamente para `Admin`.
   - Formulario de alta para `POST /admin/registro-usuario`.
 
