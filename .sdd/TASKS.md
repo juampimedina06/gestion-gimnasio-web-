@@ -30,7 +30,7 @@
   - Modal `NuevoClienteModal` para `POST /cliente/registro`.
   - Formulario React Hook Form + Zod validando campos y vinculando plan inicial.
 
-- [ ] **Ticket 8:** `feat(pagos): payment renewal modal for expired memberships`
+- [x] **Ticket 8:** `feat(pagos): payment renewal modal for expired memberships`
   - Modal `RenovarPagoModal` conectado a `POST /cliente/actualizar`.
   - Renovación de plan y método de pago con validación de estado previo.
 
