@@ -14,7 +14,7 @@
   - Pantalla `LoginScreen` con validación Zod y conexión a `POST /admin/login`.
   - Componentes `ProtectedRoute` y guards de rol.
 
-- [ ] **Ticket 4:** `feat(ui): main dashboard layout sidebar and navigation`
+- [x] **Ticket 4:** `feat(ui): main dashboard layout sidebar and navigation`
   - `MainLayout` con Sidebar responsivo y navegación dinámica según rol.
   - Navbar con información del usuario autenticado y botón de Logout.
 
