@@ -26,7 +26,7 @@
   - Vista `ClientesScreen` consumiendo `GET /cliente/lista-clientes` con React Query.
   - Buscador por DNI / Nombre, filtros por estado de cuota y badges de estado.
 
-- [ ] **Ticket 7:** `feat(clientes): new client registration modal with initial payment`
+- [x] **Ticket 7:** `feat(clientes): new client registration modal with initial payment`
   - Modal `NuevoClienteModal` para `POST /cliente/registro`.
   - Formulario React Hook Form + Zod validando campos y vinculando plan inicial.
 

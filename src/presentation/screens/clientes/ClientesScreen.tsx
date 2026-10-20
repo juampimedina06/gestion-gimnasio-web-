@@ -16,6 +16,8 @@ import { ListaClientesDTO } from '../../../core/clientes/models/cliente.types';
 import { PlanPase, PlanTipo } from '../../../core/shared/enums';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
+import { NuevoClienteModal } from './NuevoClienteModal';
+import { RenovarPagoModal } from '../pagos/RenovarPagoModal';
 import {
   formatCurrency,
   formatDate,
@@ -23,19 +25,14 @@ import {
   ClientPaymentStatus,
 } from '../../utils/formatters';
 
-interface ClientesScreenProps {
-  onOpenNuevoCliente?: () => void;
-  onOpenRenovarPago?: (dni?: number) => void;
-}
-
-export const ClientesScreen: React.FC<ClientesScreenProps> = ({
-  onOpenNuevoCliente,
-  onOpenRenovarPago,
-}) => {
+export const ClientesScreen: React.FC = () => {
   const { data: clientes = [], isLoading, isError, error, refetch, isFetching } = useClientes();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | ClientPaymentStatus>('all');
+  const [isNuevoModalOpen, setIsNuevoModalOpen] = useState(false);
+  const [isRenovarModalOpen, setIsRenovarModalOpen] = useState(false);
+  const [selectedDniForRenewal, setSelectedDniForRenewal] = useState<number | undefined>(undefined);
 
   const filteredClientes = useMemo(() => {
     return clientes.filter((c) => {
@@ -48,7 +45,7 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
 
       if (statusFilter === 'all') return true;
 
-      const { status } = getClientPaymentStatus(c.fechaVencimiento, c.plan.toleranciaDias);
+      const { status } = getClientPaymentStatus(c.fechaVencimiento, c.plan?.toleranciaDias ?? 5);
       return status === statusFilter;
     });
   }, [clientes, searchTerm, statusFilter]);
@@ -59,7 +56,7 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
     let vencidos = 0;
 
     clientes.forEach((c) => {
-      const { status } = getClientPaymentStatus(c.fechaVencimiento, c.plan.toleranciaDias);
+      const { status } = getClientPaymentStatus(c.fechaVencimiento, c.plan?.toleranciaDias ?? 5);
       if (status === 'al_dia') alDia++;
       else if (status === 'tolerancia') tolerancia++;
       else if (status === 'vencido') vencidos++;
@@ -67,6 +64,11 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
 
     return { total: clientes.length, alDia, tolerancia, vencidos };
   }, [clientes]);
+
+  const handleOpenRenewal = (dni?: number) => {
+    setSelectedDniForRenewal(dni);
+    setIsRenovarModalOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -93,27 +95,23 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
             Actualizar
           </Button>
 
-          {onOpenRenovarPago && (
-            <Button
-              variant="outline"
-              onClick={() => onOpenRenovarPago()}
-              className="h-10"
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Renovar Cuota
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            onClick={() => handleOpenRenewal()}
+            className="h-10"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Renovar Cuota
+          </Button>
 
-          {onOpenNuevoCliente && (
-            <Button
-              variant="primary"
-              onClick={() => onOpenNuevoCliente()}
-              className="h-10"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Socio
-            </Button>
-          )}
+          <Button
+            variant="primary"
+            onClick={() => setIsNuevoModalOpen(true)}
+            className="h-10"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Nuevo Socio
+          </Button>
         </div>
       </div>
 
@@ -224,7 +222,6 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
                       key={cliente.id}
                       className="hover:bg-dark-card/50 transition-colors"
                     >
-                      {/* Name */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-dark-card border border-dark-border flex items-center justify-center font-bold text-xs text-champagne-gold">
@@ -241,12 +238,10 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
                         </div>
                       </td>
 
-                      {/* DNI */}
                       <td className="px-6 py-4 font-mono text-gray-300">
                         {cliente.dni}
                       </td>
 
-                      {/* Contact */}
                       <td className="px-6 py-4">
                         <div className="space-y-1 text-xs">
                           <div className="flex items-center gap-1.5 text-gray-300">
@@ -260,7 +255,6 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
                         </div>
                       </td>
 
-                      {/* Plan */}
                       <td className="px-6 py-4">
                         <div className="text-xs">
                           <span className="font-medium text-white block">
@@ -274,7 +268,6 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
                         </div>
                       </td>
 
-                      {/* Vencimiento */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1.5 text-xs">
                           <Calendar className="w-3.5 h-3.5 text-gray-500" />
@@ -287,26 +280,22 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
                         </span>
                       </td>
 
-                      {/* Status */}
                       <td className="px-6 py-4">
                         <Badge variant={statusInfo.variant}>
                           {statusInfo.label}
                         </Badge>
                       </td>
 
-                      {/* Actions */}
                       <td className="px-6 py-4 text-right">
-                        {onOpenRenovarPago && (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => onOpenRenovarPago(cliente.dni)}
-                            className="text-xs"
-                          >
-                            <CreditCard className="w-3.5 h-3.5 mr-1" />
-                            Renovar
-                          </Button>
-                        )}
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleOpenRenewal(cliente.dni)}
+                          className="text-xs"
+                        >
+                          <CreditCard className="w-3.5 h-3.5 mr-1" />
+                          Renovar
+                        </Button>
                       </td>
                     </tr>
                   );
@@ -316,6 +305,20 @@ export const ClientesScreen: React.FC<ClientesScreenProps> = ({
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      <NuevoClienteModal
+        isOpen={isNuevoModalOpen}
+        onClose={() => setIsNuevoModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
+
+      <RenovarPagoModal
+        isOpen={isRenovarModalOpen}
+        initialDni={selectedDniForRenewal}
+        onClose={() => setIsRenovarModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
     </div>
   );
 };
