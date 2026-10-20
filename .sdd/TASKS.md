@@ -4,7 +4,7 @@
   - Scaffolding de Vite + React 18 + TS + Tailwind + Lucide + Router + Axios + TanStack Query + Zustand.
   - Setup de configuración de compilación y aliases `@/*`.
 
-- [ ] **Ticket 2:** `feat(core): domain interfaces enums and axios client`
+- [x] **Ticket 2:** `feat(core): domain interfaces enums and axios client`
   - Mapeo de enums del backend (`TipoRol`, `EstadoCliente`, `EstadoPago`, `MetodoPago`, etc.).
   - Definición de interfaces TypeScript para todos los DTOs.
   - Instancia de Axios configurada con base URL y manejo de errores.
