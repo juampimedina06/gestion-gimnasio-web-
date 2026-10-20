@@ -18,7 +18,7 @@
   - `MainLayout` con Sidebar responsivo y navegación dinámica según rol.
   - Navbar con información del usuario autenticado y botón de Logout.
 
-- [ ] **Ticket 5:** `feat(ingreso): check-in access control screen with dni scanner`
+- [x] **Ticket 5:** `feat(ingreso): check-in access control screen with dni scanner`
   - Vista `ControlAccesoScreen` conectada a `POST /cliente/ingreso`.
   - Input para DNI con soporte de escaneo / Enter y tarjeta de respuesta en tiempo real (Verde / Naranja / Rojo).
 
