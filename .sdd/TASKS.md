@@ -22,7 +22,7 @@
   - Vista `ControlAccesoScreen` conectada a `POST /cliente/ingreso`.
   - Input para DNI con soporte de escaneo / Enter y tarjeta de respuesta en tiempo real (Verde / Naranja / Rojo).
 
-- [ ] **Ticket 6:** `feat(clientes): clients table list with payment status badges`
+- [x] **Ticket 6:** `feat(clientes): clients table list with payment status badges`
   - Vista `ClientesScreen` consumiendo `GET /cliente/lista-clientes` con React Query.
   - Buscador por DNI / Nombre, filtros por estado de cuota y badges de estado.
 
