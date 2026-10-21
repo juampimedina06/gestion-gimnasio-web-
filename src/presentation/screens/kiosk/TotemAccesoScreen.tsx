@@ -5,7 +5,6 @@ import {
   Clock,
   Delete,
   CornerDownLeft,
-  RotateCcw,
   Sparkles,
   Dumbbell,
   CheckCircle2,
@@ -61,7 +60,7 @@ export const TotemAccesoScreen: React.FC = () => {
     }, 50);
   }, []);
 
-  // Temporizador de auto-reseteo
+  // Temporizador de auto-reseteo silencioso
   useEffect(() => {
     if (!result) return;
 
@@ -87,10 +86,24 @@ export const TotemAccesoScreen: React.FC = () => {
     };
   }, [result, handleClear]);
 
-  // Foco automático permanente
+  // Foco automático inicial y permanente
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Atajo de teclado: Espacio, Enter o Escape resetean inmediatamente si hay resultado en pantalla
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (result) {
+        if (e.code === 'Space' || e.code === 'Escape' || (e.code === 'Enter' && !dniInput)) {
+          e.preventDefault();
+          handleClear();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [result, dniInput, handleClear]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -101,18 +114,43 @@ export const TotemAccesoScreen: React.FC = () => {
     try {
       const res = await clientesApi.registrarIngreso({ dni: dniNumber });
       setResult(res);
+      setDniInput(''); // Limpiamos el input para que el siguiente pueda escribir directo
     } catch (err: unknown) {
       setResult({
         permitido: false,
         mensaje: err instanceof Error ? err.message : 'Error al verificar ingreso.',
       });
+      setDniInput('');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Si hay un resultado previo, escribir un nuevo DNI limpia el resultado al instante
+    if (result) {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      setResult(null);
+    }
+    setDniInput(e.target.value.replace(/\D/g, ''));
+  };
+
   const handleKeypadPress = (val: string) => {
-    if (result) handleClear();
+    // Si hay un resultado previo en pantalla, presionar un número cambia la pantalla de una vez
+    if (result) {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      setResult(null);
+
+      if (val === 'clear' || val === 'backspace') {
+        setDniInput('');
+      } else {
+        setDniInput(val); // El primer dígito del nuevo socio entra directamente
+      }
+      inputRef.current?.focus();
+      return;
+    }
 
     if (val === 'backspace') {
       setDniInput((prev) => prev.slice(0, -1));
@@ -175,7 +213,7 @@ export const TotemAccesoScreen: React.FC = () => {
         {/* Columna Izquierda: Feedback de Estado o Mensaje de Bienvenida */}
         <div className="lg:col-span-6 flex flex-col justify-center h-full">
           {result ? (
-            /* Tarjeta de Resultado de Acceso (Enorme y Clara a metros de distancia) */
+            /* Tarjeta de Resultado de Acceso (Sin botones molestos, cambia al tipear o con espacio/enter) */
             <div
               className={cn(
                 'rounded-3xl p-8 sm:p-10 border-2 shadow-2xl transition-all duration-300 relative overflow-hidden backdrop-blur-xl',
@@ -186,8 +224,8 @@ export const TotemAccesoScreen: React.FC = () => {
                   : 'bg-rose-950/40 border-rose-500 text-rose-100 shadow-rose-950/40'
               )}
             >
-              {/* Barra de progreso de auto-reseteo */}
-              <div className="absolute top-0 left-0 right-0 h-2 bg-black/60">
+              {/* Barra de progreso de auto-reseteo discreta */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-black/60">
                 <div
                   className={cn(
                     'h-full transition-all duration-1000 ease-linear',
@@ -282,22 +320,10 @@ export const TotemAccesoScreen: React.FC = () => {
                     )}
                   </div>
                 )}
-
-                {/* Botón de Siguiente Persona */}
-                <div className="pt-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleClear}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm transition-all cursor-pointer border border-white/20 active:scale-95"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    <span>Siguiente socio ({countdown}s)</span>
-                  </button>
-                </div>
               </div>
             </div>
           ) : (
-            /* Estado en Reposo (Informativo, Atractivo y Limpio) */
+            /* Estado en Reposo (Informativo y Limpio) */
             <div className="space-y-6 max-w-lg">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-volt/10 border border-volt/30 text-volt text-xs font-mono font-bold tracking-widest uppercase">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -327,7 +353,7 @@ export const TotemAccesoScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Columna Derecha: Entrada Numérica y Teclado Táctil de Alta Gama */}
+        {/* Columna Derecha: Entrada Numérica y Teclado Táctil */}
         <div className="lg:col-span-6 flex justify-center lg:justify-end">
           <div className="w-full max-w-md bg-[#111217] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
             {/* Formulario y Visor Principal de DNI */}
@@ -344,7 +370,7 @@ export const TotemAccesoScreen: React.FC = () => {
                   inputMode="numeric"
                   placeholder="••••••••"
                   value={dniInput}
-                  onChange={(e) => setDniInput(e.target.value.replace(/\D/g, ''))}
+                  onChange={handleInputChange}
                   disabled={isLoading}
                   maxLength={10}
                   className="w-full bg-[#181920] border-2 border-zinc-700 focus:border-volt rounded-2xl py-4 px-4 text-3xl sm:text-4xl font-mono font-black tracking-[0.2em] text-center text-white placeholder:text-zinc-700 focus:outline-none focus:ring-4 focus:ring-volt/15 transition-all shadow-inner"
