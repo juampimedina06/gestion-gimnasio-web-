@@ -27,6 +27,8 @@ axiosClient.interceptors.response.use(
       errorMessage = error.message;
     }
 
-    return Promise.reject(new Error(errorMessage));
+    // Preserve AxiosError while updating message
+    error.message = errorMessage;
+    return Promise.reject(error);
   }
 );
