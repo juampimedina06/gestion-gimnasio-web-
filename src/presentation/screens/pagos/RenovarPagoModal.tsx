@@ -165,15 +165,15 @@ export const RenovarPagoModal: React.FC<RenovarPagoModalProps> = ({
                   className={cn(
                     'p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between',
                     selectedPlan === p.id
-                      ? 'bg-champagne-gold/15 border-champagne-gold text-white shadow-md'
-                      : 'bg-dark-card border-dark-border text-gray-400 hover:border-gray-600'
+                      ? 'bg-volt/10 border-volt text-white shadow-md shadow-volt/10'
+                      : 'bg-dark-card border-dark-border text-zinc-400 hover:border-zinc-600'
                   )}
                 >
                   <div>
-                    <span className="font-semibold text-sm text-gray-100 block">{p.nombre}</span>
-                    <span className="text-[11px] text-gray-400">{p.descripcion}</span>
+                    <span className="font-semibold text-sm text-zinc-100 block">{p.nombre}</span>
+                    <span className="text-[11px] text-zinc-400">{p.descripcion}</span>
                   </div>
-                  <span className="text-sm font-bold text-champagne-gold font-mono">
+                  <span className="text-sm font-bold text-volt font-mono">
                     ${p.precio.toLocaleString('es-AR')}
                   </span>
                 </div>

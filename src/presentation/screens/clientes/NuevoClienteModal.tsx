@@ -180,13 +180,13 @@ export const NuevoClienteModal: React.FC<NuevoClienteModalProps> = ({
                   className={cn(
                     'p-3.5 rounded-xl border cursor-pointer transition-all',
                     selectedPlan === p.id
-                      ? 'bg-champagne-gold/15 border-champagne-gold text-white shadow-md shadow-champagne-gold/10'
-                      : 'bg-dark-card border-dark-border text-gray-400 hover:border-gray-600'
+                      ? 'bg-volt/10 border-volt text-white shadow-md shadow-volt/10'
+                      : 'bg-dark-card border-dark-border text-zinc-400 hover:border-zinc-600'
                   )}
                 >
                   <div className="flex justify-between items-start">
-                    <span className="font-semibold text-sm text-gray-100">{p.nombre}</span>
-                    <span className="text-xs font-bold text-champagne-gold">
+                    <span className="font-semibold text-sm text-zinc-100">{p.nombre}</span>
+                    <span className="text-xs font-bold text-volt font-mono">
                       ${p.precio.toLocaleString('es-AR')}
                     </span>
                   </div>
