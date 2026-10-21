@@ -361,9 +361,9 @@ export const TotemAccesoScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Columna Derecha: Entrada por Teclado Físico */}
-        <div className="lg:col-span-5 flex flex-col justify-center">
-          <div className="bg-[#101116]/90 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl backdrop-blur-xl flex flex-col justify-center space-y-8">
+        {/* Columna Derecha: Entrada por Teclado Físico (Misma altura y alineación exacta) */}
+        <div className="lg:col-span-5 flex flex-col h-full">
+          <div className="bg-[#101116]/90 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl backdrop-blur-xl flex flex-col justify-between h-full">
             <div className="space-y-2">
               <span
                 className={cn(
@@ -384,7 +384,7 @@ export const TotemAccesoScreen: React.FC = () => {
             </div>
 
             {/* Formulario y Visor Principal de DNI */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="my-auto space-y-6 w-full">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-mono uppercase tracking-widest text-zinc-400 px-1">
                   <span>Documento</span>
