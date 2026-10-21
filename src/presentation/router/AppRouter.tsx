@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { TotemAccesoScreen } from '../screens/kiosk/TotemAccesoScreen';
 import { LoginScreen } from '../screens/auth/LoginScreen';
 import { MainLayout } from '../layout/MainLayout';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -13,13 +14,16 @@ export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Member Kiosk Route */}
+        <Route path="/" element={<TotemAccesoScreen />} />
+
+        {/* Private Staff/Admin Auth Routes (unlinked from kiosk) */}
         <Route path="/login" element={<LoginScreen />} />
+        <Route path="/admin" element={<Navigate to="/login" replace />} />
 
         {/* Protected App Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardScreen />} />
             <Route path="/ingreso" element={<ControlAccesoScreen />} />
             <Route path="/clientes" element={<ClientesScreen />} />
@@ -32,8 +36,9 @@ export const AppRouter: React.FC = () => {
         </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
 };
+
