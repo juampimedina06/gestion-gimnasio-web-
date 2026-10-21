@@ -10,10 +10,13 @@ export default {
       colors: {
         obsidian: '#0A0A0C',
         'champagne-gold': '#D4AF37',
-        'dark-bg': '#0C0C0E',
-        'dark-surface': '#141416',
-        'dark-card': '#18181C',
-        'dark-border': '#232328',
+        volt: '#CCFF00',
+        'volt-hover': '#B8E600',
+        'gym-black': '#09090B',
+        'dark-bg': '#0B0C0E',
+        'dark-surface': '#111216',
+        'dark-card': '#16171E',
+        'dark-border': '#22242E',
         brand: {
           50: '#fff7ed',
           100: '#ffedd5',

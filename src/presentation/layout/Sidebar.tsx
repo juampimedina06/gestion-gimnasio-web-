@@ -36,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       adminOnly: false,
     },
     {
-      label: 'Clientes y Cuotas',
+      label: 'Socios y Cuotas',
       to: '/clientes',
       icon: Users,
       adminOnly: false,
@@ -55,41 +55,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-black/70 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm transition-opacity"
         />
       )}
 
       {/* Sidebar container */}
       <aside
         className={cn(
-          'fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-dark-surface border-r border-dark-border flex flex-col justify-between transition-transform duration-200 ease-in-out',
+          'fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-dark-surface border-r border-dark-border flex flex-col justify-between transition-transform duration-200 ease-in-out font-sans',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Top brand */}
         <div>
           <div className="h-16 flex items-center justify-between px-6 border-b border-dark-border">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-dark-card border border-dark-border flex items-center justify-center">
-                <Dumbbell className="w-5 h-5 text-champagne-gold" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-dark-card border border-dark-border flex items-center justify-center text-volt">
+                <Dumbbell className="w-4 h-4" />
               </div>
-              <div>
-                <span className="font-bold text-sm tracking-wide text-white block">GESTIÓN</span>
-                <span className="text-[10px] uppercase font-semibold text-champagne-gold tracking-widest block -mt-1">
-                  Gimnasio
+              <div className="leading-tight">
+                <span className="font-extrabold text-sm tracking-wider text-white block">
+                  GYM OS
+                </span>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-500 block">
+                  Control & Acceso
                 </span>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-dark-card"
+              className="lg:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-dark-card cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Nav links */}
-          <nav className="p-4 space-y-1.5">
+          <nav className="p-3.5 space-y-1">
             {navItems
               .filter((item) => !item.adminOnly || isAdmin)
               .map((item) => {
@@ -101,10 +103,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     onClick={() => onClose()}
                     className={({ isActive }) =>
                       cn(
-                        'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all',
+                        'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all',
                         isActive
-                          ? 'bg-champagne-gold/10 text-champagne-gold border border-champagne-gold/30'
-                          : 'text-gray-400 hover:text-gray-100 hover:bg-dark-card'
+                          ? 'bg-volt/10 text-volt border border-volt/20'
+                          : 'text-zinc-400 hover:text-white hover:bg-dark-card'
                       )
                     }
                   >
@@ -120,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="p-4 border-t border-dark-border bg-dark-surface">
           <div className="p-3 rounded-xl bg-dark-card border border-dark-border mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-dark-surface border border-dark-border flex items-center justify-center font-bold text-xs text-champagne-gold">
+              <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-volt">
                 {user?.nombre?.[0]}
                 {user?.apellido?.[0]}
               </div>
@@ -132,11 +134,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   <span
                     className={cn(
                       'inline-block w-1.5 h-1.5 rounded-full',
-                      isAdmin ? 'bg-champagne-gold' : 'bg-brand-500'
+                      isAdmin ? 'bg-volt' : 'bg-cyan-400'
                     )}
                   />
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-gray-400">
-                    {isAdmin ? 'Admin' : 'Personal Trainer'}
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-400">
+                    {isAdmin ? 'Admin' : 'Trainer'}
                   </span>
                 </div>
               </div>
@@ -145,9 +147,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
           <button
             onClick={() => logout()}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-950/30 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-950/20 transition-colors cursor-pointer border border-transparent hover:border-rose-900/30"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>Cerrar Sesión</span>
           </button>
         </div>

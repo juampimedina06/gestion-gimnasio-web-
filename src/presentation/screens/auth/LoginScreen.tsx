@@ -62,23 +62,27 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gym-black flex items-center justify-center p-4 font-sans">
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-dark-surface border border-dark-border mb-4 shadow-xl shadow-black/40">
-            <Dumbbell className="w-8 h-8 text-champagne-gold" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-dark-surface border border-dark-border mb-3 text-volt shadow-lg shadow-black/60">
+            <Dumbbell className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Gestión Gimnasio</h1>
-          <p className="text-sm text-gray-400 mt-1">Plataforma de Control y Administración</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-white uppercase">
+            GYM OS
+          </h1>
+          <p className="text-xs text-zinc-400 mt-1 uppercase font-mono tracking-widest">
+            Acceso Administrativo
+          </p>
         </div>
 
         {/* Card */}
-        <div className="bg-dark-surface border border-dark-border rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <div className="bg-dark-surface border border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {errorMessage && (
-              <div className="flex items-start gap-3 p-3.5 rounded-lg bg-red-950/40 border border-red-800/50 text-red-300 text-sm">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-300 text-xs">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{errorMessage}</span>
               </div>
             )}
@@ -101,32 +105,32 @@ export const LoginScreen: React.FC = () => {
               {...register('contrasena')}
             />
 
-            <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
-              Iniciar Sesión
+            <Button type="submit" variant="volt" className="w-full" size="lg" isLoading={isLoading}>
+              Ingresar al Sistema
             </Button>
           </form>
 
           {/* Quick Test Accounts */}
           <div className="mt-8 pt-6 border-t border-dark-border">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 text-center mb-3">
+            <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 text-center mb-3">
               Cuentas de prueba rápidas
             </p>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => setTestAccount('admin@gimnasio.com', 'admin123')}
-                className="p-2.5 rounded-lg bg-dark-card border border-dark-border hover:border-champagne-gold/60 text-gray-300 hover:text-white text-left transition-colors"
+                className="p-2.5 rounded-xl bg-dark-card border border-dark-border hover:border-volt/60 text-zinc-300 hover:text-white text-left transition-colors cursor-pointer"
               >
-                <div className="font-medium text-champagne-gold">Admin</div>
-                <div className="text-[11px] text-gray-400 truncate">admin@gimnasio.com</div>
+                <div className="font-bold text-volt">Admin</div>
+                <div className="text-[10px] font-mono text-zinc-500 truncate">admin@gimnasio.com</div>
               </button>
               <button
                 type="button"
                 onClick={() => setTestAccount('juan@gimnasio.com', 'juan123')}
-                className="p-2.5 rounded-lg bg-dark-card border border-dark-border hover:border-champagne-gold/60 text-gray-300 hover:text-white text-left transition-colors"
+                className="p-2.5 rounded-xl bg-dark-card border border-dark-border hover:border-volt/60 text-zinc-300 hover:text-white text-left transition-colors cursor-pointer"
               >
-                <div className="font-medium text-brand-500">Personal Trainer</div>
-                <div className="text-[11px] text-gray-400 truncate">juan@gimnasio.com</div>
+                <div className="font-bold text-cyan-400">Trainer</div>
+                <div className="text-[10px] font-mono text-zinc-500 truncate">juan@gimnasio.com</div>
               </button>
             </div>
           </div>
