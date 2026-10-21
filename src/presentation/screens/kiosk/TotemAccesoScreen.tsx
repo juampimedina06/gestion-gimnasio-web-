@@ -201,68 +201,82 @@ export const TotemAccesoScreen: React.FC = () => {
 
       {/* Cuerpo Central Inmersivo (Grid 2 Columnas) */}
       <main className="flex-1 w-full my-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch min-h-0 relative z-10">
-        {/* Columna Izquierda: Escena Hero o Tarjeta de Acceso de Alto Impacto */}
-        <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-between p-8 sm:p-12 bg-zinc-950/80 backdrop-blur-md">
-          {/* Fondo Fotográfico Cinematográfico */}
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-all duration-700 filter brightness-[0.35] contrast-[1.15]"
-            style={{ backgroundImage: `url('/gym_hero.jpg')` }}
-          />
-
-          {/* Gradientes para máxima legibilidad */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-
-          {/* Tag Superior */}
-          <div className="relative z-10 flex items-center justify-between">
-            <span className="inline-block px-3.5 py-1.5 rounded-full bg-black/70 border border-white/15 text-[11px] font-mono uppercase tracking-[0.25em] text-zinc-200 backdrop-blur-md">
-              Pase Digital del Gimnasio
-            </span>
-
-            {/* Aviso de persistencia cuando hay resultado */}
-            {result && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/10 text-[10px] font-mono text-zinc-300 backdrop-blur-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                Persiste hasta el próximo DNI o Enter
-              </span>
-            )}
-          </div>
-
-          {/* Estado o Bienvenida */}
-          <div className="relative z-10 my-auto">
-            {result ? (
-              /* Tarjeta de Confirmación de Acceso de Alto Contraste */
+        {/* Columna Izquierda: Escena Hero en reposo O Tarjeta de Acceso Pantalla Completa que tapa toda la imagen */}
+        <div
+          className={cn(
+            'lg:col-span-7 relative rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between transition-all duration-500',
+            !result
+              ? 'border border-white/10 p-8 sm:p-12 bg-zinc-950/80 backdrop-blur-md'
+              : result.permitido
+              ? isTolerancia
+                ? 'border-2 border-amber-400 bg-gradient-to-br from-[#1a0e02] via-[#2a1705] to-[#120a02] p-8 sm:p-12 shadow-[0_0_80px_rgba(245,158,11,0.25)] text-amber-50'
+                : 'border-2 border-emerald-400 bg-gradient-to-br from-[#021f11] via-[#04331d] to-[#01140b] p-8 sm:p-12 shadow-[0_0_80px_rgba(16,185,129,0.25)] text-emerald-50'
+              : 'border-2 border-rose-500 bg-gradient-to-br from-[#200407] via-[#35070d] to-[#140204] p-8 sm:p-12 shadow-[0_0_80px_rgba(244,63,94,0.3)] text-rose-50'
+          )}
+        >
+          {!result ? (
+            <>
+              {/* Fondo Fotográfico Cinematográfico (Sólo en reposo) */}
               <div
-                className={cn(
-                  'rounded-3xl p-8 sm:p-10 border-2 backdrop-blur-2xl shadow-2xl transition-all duration-500 relative overflow-hidden bg-black/80',
-                  result.permitido
-                    ? isTolerancia
-                      ? 'border-amber-400 shadow-[0_0_50px_rgba(245,158,11,0.25)] text-amber-50'
-                      : 'border-emerald-400 shadow-[0_0_50px_rgba(16,185,129,0.25)] text-emerald-50'
-                    : 'border-rose-500 shadow-[0_0_50px_rgba(244,63,94,0.3)] text-rose-50'
-                )}
-              >
-                {/* Encabezado del Estado e Ícono */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2.5">
-                    {result.permitido ? (
-                      isTolerancia ? (
-                        <div className="w-10 h-10 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400">
-                          <AlertTriangle className="w-5 h-5" />
-                        </div>
-                      ) : (
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
-                          <CheckCircle2 className="w-5 h-5" />
-                        </div>
-                      )
-                    ) : (
-                      <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
-                        <XCircle className="w-5 h-5" />
-                      </div>
-                    )}
+                className="absolute inset-0 bg-cover bg-center transition-all duration-700 filter brightness-[0.35] contrast-[1.15]"
+                style={{ backgroundImage: `url('/gym_hero.jpg')` }}
+              />
 
+              {/* Gradientes para máxima legibilidad */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+
+              {/* Tag Superior */}
+              <div className="relative z-10 flex items-center justify-between">
+                <span className="inline-block px-3.5 py-1.5 rounded-full bg-black/70 border border-white/15 text-[11px] font-mono uppercase tracking-[0.25em] text-zinc-200 backdrop-blur-md">
+                  Pase Digital del Gimnasio
+                </span>
+              </div>
+
+              {/* Mensaje de Reposo Limpio */}
+              <div className="relative z-10 my-auto space-y-4">
+                <span className="text-xs font-mono uppercase tracking-[0.2em] text-volt block">
+                  Autenticación de Asistencia
+                </span>
+                <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-tight">
+                  Entrená <br />
+                  <span className="text-volt">sin límites.</span>
+                </h2>
+                <p className="text-sm sm:text-base text-zinc-300 max-w-md leading-relaxed font-light">
+                  Ingresá tu DNI en el teclado físico y presioná Enter para habilitar el molinete.
+                </p>
+              </div>
+
+              {/* Tip Inferior */}
+              <div className="relative z-10 pt-4 text-xs font-mono text-zinc-400 flex items-center justify-between">
+                <span>Terminal Automatizada GYM OS</span>
+                <span>Uso Exclusivo de Socios</span>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Tarjeta de Acceso Pantalla Completa: Tapa toda la imagen con la info */}
+              <div className="relative z-10 flex items-center justify-between border-b border-white/15 pb-5">
+                <div className="flex items-center gap-3">
+                  {result.permitido ? (
+                    isTolerancia ? (
+                      <div className="w-12 h-12 rounded-2xl bg-amber-400/20 border-2 border-amber-400/60 flex items-center justify-center text-amber-400 shadow-lg">
+                        <AlertTriangle className="w-6 h-6" />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-400/20 border-2 border-emerald-400/60 flex items-center justify-center text-emerald-400 shadow-lg">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                    )
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border-2 border-rose-500/60 flex items-center justify-center text-rose-400 shadow-lg">
+                      <XCircle className="w-6 h-6" />
+                    </div>
+                  )}
+
+                  <div>
                     <span
                       className={cn(
-                        'text-xs sm:text-sm font-mono font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full border',
+                        'text-xs font-mono font-black uppercase tracking-widest px-3 py-1 rounded-full border inline-block mb-1',
                         result.permitido
                           ? isTolerancia
                             ? 'bg-amber-400/20 text-amber-300 border-amber-400/40'
@@ -276,42 +290,57 @@ export const TotemAccesoScreen: React.FC = () => {
                           : 'Paso Autorizado • Al Día'
                         : 'Acceso Denegado • Regularizar'}
                     </span>
+                    <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                      {result.permitido ? 'Molinete Habilitado // Pase Activo' : 'Molinete Bloqueado'}
+                    </p>
                   </div>
-
-                  <span className="hidden sm:inline-block text-[11px] font-mono uppercase tracking-wider text-zinc-400">
-                    Molinete Habilitado
-                  </span>
                 </div>
 
-                {/* Nombre del Socio */}
-                <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase mt-2">
-                  {result.nombreCliente || (result.permitido ? 'Socio Habilitado' : 'Socio No Habilitado')}
-                </h2>
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 border border-white/10 text-[11px] font-mono text-zinc-300">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  Pase Activo
+                </span>
+              </div>
 
-                {/* Mensaje Oficial del Backend */}
-                <p className="text-base sm:text-xl mt-3 font-normal opacity-95 leading-relaxed">
-                  {result.mensaje}
-                </p>
+              {/* Contenido Central de la Tarjeta con la Información */}
+              <div className="relative z-10 my-auto py-6 space-y-6">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 block mb-1">
+                    Nombre del Socio
+                  </span>
+                  <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-none">
+                    {result.nombreCliente || (result.permitido ? 'Socio Habilitado' : 'Socio No Habilitado')}
+                  </h2>
+                </div>
 
-                {/* Fechas Informativas de Membresía */}
+                <div className="p-5 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-sm">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block mb-1">
+                    Estado Oficial
+                  </span>
+                  <p className="text-lg sm:text-2xl font-semibold text-white leading-snug">
+                    {result.mensaje}
+                  </p>
+                </div>
+
+                {/* Fechas de Vencimiento / Tolerancia en Cajas Grandes */}
                 {(result.fechaVencimiento || result.fechaLimitePago) && (
-                  <div className="mt-6 pt-5 border-t border-white/10 grid grid-cols-2 gap-4 text-xs font-mono">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {result.fechaVencimiento && (
-                      <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-                        <span className="text-zinc-400 block text-[11px] uppercase tracking-wider mb-1">
+                      <div className="bg-black/40 border border-white/10 rounded-2xl p-5">
+                        <span className="text-zinc-400 block text-xs uppercase font-mono tracking-wider mb-1">
                           Vencimiento de Cuota
                         </span>
-                        <strong className="text-white text-base sm:text-lg font-bold">
+                        <strong className="text-white text-xl sm:text-2xl font-bold font-mono">
                           {new Date(result.fechaVencimiento).toLocaleDateString()}
                         </strong>
                       </div>
                     )}
                     {result.fechaLimitePago && (
-                      <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-                        <span className="text-zinc-400 block text-[11px] uppercase tracking-wider mb-1">
+                      <div className="bg-black/40 border border-white/10 rounded-2xl p-5">
+                        <span className="text-zinc-400 block text-xs uppercase font-mono tracking-wider mb-1">
                           Límite de Tolerancia
                         </span>
-                        <strong className="text-white text-base sm:text-lg font-bold">
+                        <strong className="text-white text-xl sm:text-2xl font-bold font-mono">
                           {new Date(result.fechaLimitePago).toLocaleDateString()}
                         </strong>
                       </div>
@@ -319,28 +348,17 @@ export const TotemAccesoScreen: React.FC = () => {
                   </div>
                 )}
               </div>
-            ) : (
-              /* Mensaje de Reposo Limpio */
-              <div className="space-y-4">
-                <span className="text-xs font-mono uppercase tracking-[0.2em] text-volt block">
-                  Autenticación de Asistencia
-                </span>
-                <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-tight">
-                  Entrená <br />
-                  <span className="text-volt">sin límites.</span>
-                </h2>
-                <p className="text-sm sm:text-base text-zinc-300 max-w-md leading-relaxed font-light">
-                  Ingresá tu DNI en el teclado físico y presioná Enter para habilitar el molinete.
-                </p>
-              </div>
-            )}
-          </div>
 
-          {/* Tip Inferior */}
-          <div className="relative z-10 pt-4 text-xs font-mono text-zinc-400 flex items-center justify-between">
-            <span>Terminal Automatizada GYM OS</span>
-            <span>Uso Exclusivo de Socios</span>
-          </div>
+              {/* Footer de la Tarjeta */}
+              <div className="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs font-mono text-zinc-400">
+                <span className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  Tipeá el próximo DNI o presioná Enter
+                </span>
+                <span className="hidden sm:inline">GYM OS • Terminal #01</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Columna Derecha: Entrada por Teclado Físico */}
