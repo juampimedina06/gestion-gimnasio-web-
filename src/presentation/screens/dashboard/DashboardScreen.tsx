@@ -1,23 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Search,
-  UserPlus,
-  RotateCcw,
-  CreditCard,
-  X,
-  Users,
-  CheckCircle2,
-  AlertTriangle,
-  TrendingUp,
-  Dumbbell,
-  ShieldCheck,
-  Activity,
-  ExternalLink,
-  Clock,
-  UserCheck,
-  Flame,
-} from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useClientes } from '../../hooks/useClientes';
 import { useAuthStore } from '../../store/useAuthStore';
 import { TipoRol, PlanPase } from '../../../core/shared/enums';
@@ -30,6 +13,8 @@ import {
   formatDate,
   getClientPaymentStatus,
 } from '../../utils/formatters';
+
+const LIMITE_AFORO_SALA = 50;
 
 export const DashboardScreen: React.FC = () => {
   const { data: clientes = [], isLoading, refetch } = useClientes();
@@ -68,6 +53,16 @@ export const DashboardScreen: React.FC = () => {
     const pctLibre = total > 0 ? Math.round((paseLibreCount / total) * 100) : 0;
     const pctTresDias = total > 0 ? Math.round((paseTresDiasCount / total) * 100) : 0;
 
+    // Estimación realista de ocupación en sala según socios habilitados
+    const sociosHabilitados = alDia + tolerancia;
+    // Ocupación en sala (máximo 50)
+    const ocupacionActual = Math.min(
+      Math.max(Math.round(sociosHabilitados * 0.4), sociosHabilitados > 0 ? 3 : 0),
+      LIMITE_AFORO_SALA
+    );
+    const porcentajeAforo = Math.round((ocupacionActual / LIMITE_AFORO_SALA) * 100);
+    const lugaresDisponibles = LIMITE_AFORO_SALA - ocupacionActual;
+
     return {
       total,
       alDia,
@@ -79,6 +74,9 @@ export const DashboardScreen: React.FC = () => {
       tasaAlDia,
       pctLibre,
       pctTresDias,
+      ocupacionActual,
+      porcentajeAforo,
+      lugaresDisponibles,
     };
   }, [clientes]);
 
@@ -103,39 +101,37 @@ export const DashboardScreen: React.FC = () => {
     setIsRenovarModalOpen(true);
   };
 
-  // Cálculo del turno actual
+  // Turno actual
   const currentHour = new Date().getHours();
   const currentTurno =
     currentHour < 13
-      ? 'Turno Mañana (07:00 - 13:00)'
+      ? 'Mañana (07:00 - 13:00)'
       : currentHour < 20
-      ? 'Turno Tarde (13:00 - 20:00)'
-      : 'Turno Noche (20:00 - 23:00)';
+      ? 'Tarde (13:00 - 20:00)'
+      : 'Noche (20:00 - 23:00)';
 
   return (
     <div className="h-full flex flex-col space-y-3 font-sans w-full min-h-0">
-      {/* 1. Header Compacto (Sin desperdicio vertical) */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-dark-surface/80 border border-dark-border px-4 py-2.5 rounded-2xl flex-shrink-0 backdrop-blur-sm">
+      {/* 1. Header Tipográfico y Limpio (Sin íconos decorativos) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-dark-surface border border-dark-border px-5 py-2.5 rounded-2xl flex-shrink-0">
         <div className="flex items-center gap-3">
-          <h1 className="text-base sm:text-lg font-black tracking-tight text-white uppercase flex items-center gap-2">
-            <span>{isAdmin ? 'Panel de Administración' : 'Panel de Entrenador'}</span>
+          <h1 className="text-base sm:text-lg font-black tracking-wider text-white uppercase">
+            {isAdmin ? 'Panel de Administración' : 'Panel de Entrenador'}
           </h1>
 
-          {/* Badge de Rol */}
+          {/* Badge tipográfico de rol */}
           {isAdmin ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-volt/10 border border-volt/30 text-volt text-[11px] font-bold font-mono tracking-wider shadow-[0_0_8px_rgba(204,255,0,0.1)]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              ADMIN
+            <span className="px-2.5 py-0.5 rounded-full bg-volt/10 border border-volt/30 text-volt text-[11px] font-bold font-mono tracking-wider">
+              ADMIN // FULL ACCESS
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[11px] font-bold font-mono tracking-wider shadow-[0_0_8px_rgba(6,182,212,0.1)]">
-              <Activity className="w-3.5 h-3.5" />
-              TRAINER
+            <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[11px] font-bold font-mono tracking-wider">
+              TRAINER // SALA
             </span>
           )}
 
-          <span className="hidden md:inline text-xs text-zinc-500 font-mono">
-            // GYM OS v1.0
+          <span className="hidden md:inline text-xs text-zinc-600 font-mono">
+            // GYM OS
           </span>
         </div>
 
@@ -148,9 +144,8 @@ export const DashboardScreen: React.FC = () => {
               setSelectedDniForRenewal(undefined);
               setIsRenovarModalOpen(true);
             }}
-            className="text-xs h-8 px-3"
+            className="text-xs h-8 px-3 font-bold"
           >
-            <RotateCcw className="w-3 h-3 mr-1.5" />
             Cobrar Cuota
           </Button>
 
@@ -158,100 +153,103 @@ export const DashboardScreen: React.FC = () => {
             variant="volt"
             size="sm"
             onClick={() => setIsNuevoModalOpen(true)}
-            className="text-xs h-8 px-3"
+            className="text-xs h-8 px-3.5 font-bold"
           >
-            <UserPlus className="w-3 h-3 mr-1.5" />
-            Nuevo Socio
+            + Nuevo Socio
           </Button>
         </div>
       </div>
 
-      {/* 2. Cinta de KPIs Compacta (4 Indicadores Clave) */}
+      {/* 2. Cinta de KPIs Tipográficos (Sin cajitas de íconos genéricos) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 flex-shrink-0">
         {/* KPI 1: Total Socios */}
-        <div className="bg-dark-surface border border-dark-border rounded-xl px-3.5 py-2 flex items-center justify-between shadow-sm">
-          <div>
-            <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider block">
+        <div className="bg-dark-surface border border-dark-border rounded-xl px-4 py-2.5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono uppercase text-zinc-500 tracking-widest font-semibold">
               Total Socios
             </span>
-            <span className="text-xl font-black text-white font-mono leading-tight block">
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+          </div>
+          <div className="mt-1 flex items-baseline justify-between">
+            <span className="text-2xl font-black text-white font-mono leading-none">
               {stats.total}
             </span>
-          </div>
-          <div className="w-8 h-8 rounded-lg bg-dark-card border border-dark-border flex items-center justify-center text-zinc-400">
-            <Users className="w-4 h-4" />
+            <span className="text-[10px] font-mono text-zinc-500">Padrón activo</span>
           </div>
         </div>
 
         {/* KPI 2: Al Día */}
-        <div className="bg-dark-surface border border-dark-border rounded-xl px-3.5 py-2 flex items-center justify-between shadow-sm">
-          <div>
-            <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider block">
-              Al Día
+        <div className="bg-dark-surface border border-dark-border rounded-xl px-4 py-2.5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono uppercase text-zinc-500 tracking-widest font-semibold">
+              Cuotas al Día
             </span>
-            <div className="flex items-baseline gap-1.5 leading-tight">
-              <span className="text-xl font-black text-volt font-mono">{stats.alDia}</span>
-              <span className="text-[10px] text-volt/80 font-mono">({stats.tasaAlDia}%)</span>
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-volt" />
           </div>
-          <div className="w-8 h-8 rounded-lg bg-volt/10 border border-volt/20 flex items-center justify-center text-volt">
-            <CheckCircle2 className="w-4 h-4" />
+          <div className="mt-1 flex items-baseline justify-between">
+            <span className="text-2xl font-black text-volt font-mono leading-none">
+              {stats.alDia}
+            </span>
+            <span className="text-[10px] font-mono text-volt/80">{stats.tasaAlDia}% regular</span>
           </div>
         </div>
 
         {/* KPI 3: En Tolerancia */}
-        <div className="bg-dark-surface border border-dark-border rounded-xl px-3.5 py-2 flex items-center justify-between shadow-sm">
-          <div>
-            <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider block">
+        <div className="bg-dark-surface border border-dark-border rounded-xl px-4 py-2.5 flex flex-col justify-between shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-mono uppercase text-zinc-500 tracking-widest font-semibold">
               En Tolerancia
             </span>
-            <span className="text-xl font-black text-amber-400 font-mono leading-tight block">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          </div>
+          <div className="mt-1 flex items-baseline justify-between">
+            <span className="text-2xl font-black text-amber-400 font-mono leading-none">
               {stats.tolerancia}
             </span>
-          </div>
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
+            <span className="text-[10px] font-mono text-amber-400/80">&le; 5 días</span>
           </div>
         </div>
 
         {/* KPI 4: Adaptado al Rol */}
         {isAdmin ? (
-          <div className="bg-dark-surface border border-dark-border rounded-xl px-3.5 py-2 flex items-center justify-between shadow-sm">
-            <div>
-              <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider block">
+          <div className="bg-dark-surface border border-dark-border rounded-xl px-4 py-2.5 flex flex-col justify-between shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase text-zinc-500 tracking-widest font-semibold">
                 Cartera Mensual
               </span>
-              <span className="text-lg font-black text-emerald-400 font-mono leading-tight block truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            </div>
+            <div className="mt-1 flex items-baseline justify-between">
+              <span className="text-xl font-black text-emerald-400 font-mono leading-none truncate">
                 {formatCurrency(stats.ingresosTotales)}
               </span>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <TrendingUp className="w-4 h-4" />
+              <span className="text-[10px] font-mono text-zinc-500">Facturación</span>
             </div>
           </div>
         ) : (
-          <div className="bg-dark-surface border border-dark-border rounded-xl px-3.5 py-2 flex items-center justify-between shadow-sm">
-            <div>
-              <span className="text-[10px] font-mono uppercase text-zinc-400 tracking-wider block">
-                Habilitados Sala
+          <div className="bg-dark-surface border border-dark-border rounded-xl px-4 py-2.5 flex flex-col justify-between shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase text-zinc-500 tracking-widest font-semibold">
+                Habilitados en Sala
               </span>
-              <span className="text-xl font-black text-cyan-400 font-mono leading-tight block">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            </div>
+            <div className="mt-1 flex items-baseline justify-between">
+              <span className="text-2xl font-black text-cyan-400 font-mono leading-none">
                 {stats.alDia + stats.tolerancia}
               </span>
-            </div>
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-              <Dumbbell className="w-4 h-4" />
+              <span className="text-[10px] font-mono text-cyan-400/80">Aptos</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* 3. Área de Trabajo Principal (Ocupa todo el alto restante SIN scrollear la ventana) */}
+      {/* 3. Área de Trabajo Principal (Aprovecha el alto sin scroll de ventana) */}
       <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-3.5 items-stretch">
-        {/* Columna Izquierda / Central: Tabla de Socios con Scroll Interno Exclusivo */}
+        {/* Columna Izquierda: Tabla de Socios con Scroll Interno */}
         <div className="xl:col-span-8 2xl:col-span-9 bg-dark-surface border border-dark-border rounded-2xl flex flex-col min-h-0 shadow-xl overflow-hidden">
-          {/* Barra de Filtros y Buscador */}
-          <div className="p-3 border-b border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-dark-card/40 flex-shrink-0">
+          {/* Controles de búsqueda y filtros */}
+          <div className="p-3 border-b border-dark-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-dark-card/30 flex-shrink-0">
             {/* Buscador Rápido */}
             <div className="relative flex-1 max-w-sm">
               <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -297,7 +295,7 @@ export const DashboardScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Contenedor de Tabla con Scroll Interno Suave */}
+          {/* Tabla de Socios con encabezado pegajoso */}
           <div className="flex-1 overflow-y-auto min-h-0">
             {isLoading ? (
               <div className="py-16 text-center text-xs text-zinc-500 font-mono">
@@ -343,11 +341,11 @@ export const DashboardScreen: React.FC = () => {
                         </td>
                         <td className="py-2.5 px-4 text-zinc-400">
                           {c.plan?.pase === PlanPase.Libre ? (
-                            <span className="inline-flex items-center gap-1 text-volt font-mono text-[11px]">
+                            <span className="text-volt font-mono text-[11px] font-semibold">
                               Pase Libre
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-cyan-400 font-mono text-[11px]">
+                            <span className="text-cyan-400 font-mono text-[11px] font-semibold">
                               Pase 3 Días
                             </span>
                           )}
@@ -363,9 +361,8 @@ export const DashboardScreen: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleQuickRenew(c.dni)}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-volt text-black font-bold text-[11px] hover:bg-volt-hover transition-all cursor-pointer shadow-sm"
+                              className="px-2.5 py-1 rounded-lg bg-volt text-black font-bold text-[11px] hover:bg-volt-hover transition-all cursor-pointer shadow-sm"
                             >
-                              <CreditCard className="w-3 h-3" />
                               Cobrar
                             </button>
                           ) : (
@@ -383,74 +380,72 @@ export const DashboardScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Columna Derecha: Widgets Compactos de Telemetría (Encajan sin scroll de ventana) */}
+        {/* Columna Derecha: Widgets Claros y Funcionales (Sin íconos decorativos genéricos) */}
         <div className="xl:col-span-4 2xl:col-span-3 flex flex-col justify-between gap-3 min-h-0">
-          {/* Widget 1: Monitor de Sala y Kiosk */}
-          <div className="bg-dark-surface border border-dark-border rounded-xl p-3.5 space-y-2.5 shadow-md flex-1 flex flex-col justify-between">
+          {/* Widget 1: Aforo y Capacidad de la Sala (Límite: 50 personas) */}
+          <div className="bg-dark-surface border border-dark-border rounded-2xl p-4 space-y-3 shadow-md flex-1 flex flex-col justify-between">
             <div className="flex items-center justify-between pb-2 border-b border-dark-border">
-              <div className="flex items-center gap-2">
-                <Flame className="w-3.5 h-3.5 text-volt" />
-                <span className="font-bold text-xs uppercase tracking-wider text-white">
-                  Estado de Sala
+              <span className="font-mono text-xs uppercase tracking-widest text-white font-bold">
+                Aforo en Sala
+              </span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono">
+                {currentTurno}
+              </span>
+            </div>
+
+            {/* Medidor Claro: Personas vs Límite 50 */}
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-2xl font-black text-white font-mono leading-none">
+                  {stats.ocupacionActual} <span className="text-xs text-zinc-500 font-normal">/ {LIMITE_AFORO_SALA} máx</span>
+                </span>
+                <span className="text-xs font-mono font-bold text-volt">
+                  {stats.lugaresDisponibles} libres
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                EN VIVO
-              </div>
-            </div>
 
-            {/* Turno Actual */}
-            <div className="px-2.5 py-1.5 rounded-lg bg-dark-card border border-dark-border flex items-center justify-between text-xs">
-              <span className="text-zinc-400 text-[11px] flex items-center gap-1.5 font-mono">
-                <Clock className="w-3 h-3 text-volt" /> Turno
-              </span>
-              <span className="font-semibold text-white text-[11px]">{currentTurno}</span>
-            </div>
-
-            {/* Capacidad Estimada */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-zinc-400 text-[11px]">Capacidad Estimada</span>
-                <span className="text-volt font-mono font-bold text-[11px]">42% (Óptimo)</span>
-              </div>
-              <div className="w-full bg-dark-card h-1.5 rounded-full overflow-hidden border border-dark-border">
+              {/* Barra de Progreso del Aforo */}
+              <div className="w-full bg-dark-card h-2 rounded-full overflow-hidden border border-dark-border">
                 <div
                   className="bg-volt h-full rounded-full transition-all duration-500"
-                  style={{ width: '42%' }}
+                  style={{ width: `${stats.porcentajeAforo}%` }}
                 />
+              </div>
+
+              <div className="flex justify-between text-[11px] font-mono text-zinc-500 pt-0.5">
+                <span>Capacidad actual</span>
+                <span>{stats.porcentajeAforo}% ocupado</span>
               </div>
             </div>
 
-            {/* Acceso Kiosk */}
+            {/* Botón Acceso Kiosk */}
             <a
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-dark-card hover:bg-zinc-800 text-zinc-300 hover:text-white border border-dark-border text-xs font-semibold transition-all group"
+              className="flex items-center justify-between w-full px-3.5 py-2.5 rounded-xl bg-dark-card hover:bg-zinc-800 text-zinc-200 hover:text-white border border-dark-border text-xs font-bold transition-all group"
             >
-              <div className="flex items-center gap-2">
-                <ExternalLink className="w-3.5 h-3.5 text-volt group-hover:scale-110 transition-transform" />
-                <span>Lanzar Pantalla Kiosk</span>
-              </div>
-              <span className="text-[10px] font-mono text-zinc-500">Molinete</span>
+              <span>Abrir Pantalla Kiosk Molinete</span>
+              <span className="font-mono text-volt group-hover:translate-x-1 transition-transform">&rarr;</span>
             </a>
           </div>
 
           {/* Widget 2: Distribución de Membresías */}
-          <div className="bg-dark-surface border border-dark-border rounded-xl p-3.5 space-y-2.5 shadow-md flex-1 flex flex-col justify-between">
-            <div className="flex items-center gap-2 pb-2 border-b border-dark-border">
-              <Dumbbell className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="font-bold text-xs uppercase tracking-wider text-white">
-                Distribución de Membresías
+          <div className="bg-dark-surface border border-dark-border rounded-2xl p-4 space-y-3 shadow-md flex-1 flex flex-col justify-between">
+            <div className="flex items-center justify-between pb-2 border-b border-dark-border">
+              <span className="font-mono text-xs uppercase tracking-widest text-white font-bold">
+                Planes y Membresías
+              </span>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                {stats.total} Socios
               </span>
             </div>
 
             {/* Pase Libre */}
             <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-zinc-400 text-[11px]">Pase Libre</span>
-                <span className="text-volt font-mono font-semibold text-[11px]">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-zinc-400">Pase Libre</span>
+                <span className="text-volt font-bold">
                   {stats.paseLibreCount} ({stats.pctLibre}%)
                 </span>
               </div>
@@ -464,9 +459,9 @@ export const DashboardScreen: React.FC = () => {
 
             {/* Pase 3 Días */}
             <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-zinc-400 text-[11px]">Pase 3 Días</span>
-                <span className="text-cyan-400 font-mono font-semibold text-[11px]">
+              <div className="flex justify-between text-xs font-mono">
+                <span className="text-zinc-400">Pase 3 Días</span>
+                <span className="text-cyan-400 font-bold">
                   {stats.paseTresDiasCount} ({stats.pctTresDias}%)
                 </span>
               </div>
@@ -478,53 +473,50 @@ export const DashboardScreen: React.FC = () => {
               </div>
             </div>
 
-            {/* Cumplimiento de Cuotas */}
-            <div className="px-2.5 py-1.5 rounded-lg bg-dark-card border border-dark-border flex items-center justify-between text-xs">
-              <span className="text-zinc-400 text-[11px]">Tasa al Día: <strong className="text-white font-mono">{stats.tasaAlDia}%</strong></span>
-              <span className="text-zinc-400 text-[11px]">Vencidos: <strong className="text-rose-400 font-mono">{stats.vencidos}</strong></span>
+            {/* Resumen de Morosidad */}
+            <div className="px-3 py-1.5 rounded-xl bg-dark-card border border-dark-border flex items-center justify-between text-xs font-mono">
+              <span className="text-zinc-400">Al Día: <strong className="text-white">{stats.tasaAlDia}%</strong></span>
+              <span className="text-zinc-400">Vencidos: <strong className="text-rose-400">{stats.vencidos}</strong></span>
             </div>
           </div>
 
           {/* Widget 3: Acceso Directo por Rol */}
           {isAdmin ? (
-            <div className="bg-dark-surface border border-dark-border rounded-xl p-3.5 space-y-2 shadow-md">
-              <div className="flex items-center gap-2 pb-1.5 border-b border-dark-border">
-                <ShieldCheck className="w-3.5 h-3.5 text-volt" />
-                <span className="font-bold text-xs uppercase tracking-wider text-white">
-                  Equipo de Entrenadores
+            <div className="bg-dark-surface border border-dark-border rounded-2xl p-4 space-y-2 shadow-md">
+              <div className="flex items-center justify-between pb-1.5 border-b border-dark-border">
+                <span className="font-mono text-xs uppercase tracking-widest text-white font-bold">
+                  Personal Trainers
                 </span>
+                <span className="text-[10px] font-mono text-volt">Staff</span>
               </div>
               <p className="text-[11px] text-zinc-400">
-                Supervisá los accesos del personal y asignación de turnos.
+                Supervisá los accesos del personal y entrenadores activos.
               </p>
               <Link
                 to="/trainers"
-                className="flex items-center justify-between w-full px-3 py-1.5 rounded-lg bg-volt/10 hover:bg-volt/20 text-volt border border-volt/30 text-xs font-bold transition-all"
+                className="flex items-center justify-between w-full px-3 py-2 rounded-xl bg-volt/10 hover:bg-volt/20 text-volt border border-volt/30 text-xs font-bold transition-all"
               >
-                <div className="flex items-center gap-1.5">
-                  <UserCheck className="w-3.5 h-3.5" />
-                  <span>Gestionar Personal Trainers</span>
-                </div>
-                <span>&rarr;</span>
+                <span>Administrar Entrenadores</span>
+                <span className="font-mono">&rarr;</span>
               </Link>
             </div>
           ) : (
-            <div className="bg-dark-surface border border-dark-border rounded-xl p-3.5 space-y-2 shadow-md">
-              <div className="flex items-center gap-2 pb-1.5 border-b border-dark-border">
-                <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="font-bold text-xs uppercase tracking-wider text-white">
+            <div className="bg-dark-surface border border-dark-border rounded-2xl p-4 space-y-2 shadow-md">
+              <div className="flex items-center justify-between pb-1.5 border-b border-dark-border">
+                <span className="font-mono text-xs uppercase tracking-widest text-white font-bold">
                   Atención en Sala
                 </span>
+                <span className="text-[10px] font-mono text-cyan-400">Reglas</span>
               </div>
               <p className="text-[11px] text-zinc-400">
-                Socios en tolerancia pueden ingresar pero deben regularizar cuota.
+                Socios en tolerancia pueden ingresar pero deben regularizar su cuota.
               </p>
               <Link
                 to="/clientes"
-                className="flex items-center justify-between w-full px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-bold transition-all"
+                className="flex items-center justify-between w-full px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-bold transition-all"
               >
-                <span>Ver Padrón Completo</span>
-                <span>&rarr;</span>
+                <span>Ver Padrón de Socios</span>
+                <span className="font-mono">&rarr;</span>
               </Link>
             </div>
           )}
