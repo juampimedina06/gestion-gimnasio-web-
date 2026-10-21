@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  ShieldCheck,
-  ShieldX,
   AlertTriangle,
   Calendar,
   Clock,
   Delete,
   CornerDownLeft,
   RotateCcw,
+  Sparkles,
+  Dumbbell,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { clientesApi } from '../../../core/clientes/clientes.api';
 import { ResultadoIngresoDTO } from '../../../core/clientes/models/cliente.types';
-import { Button } from '../../components/Button';
 import { cn } from '../../utils/cn';
 
 const AUTO_RESET_SECONDS = 5;
@@ -22,17 +23,26 @@ export const TotemAccesoScreen: React.FC = () => {
   const [result, setResult] = useState<ResultadoIngresoDTO | null>(null);
   const [countdown, setCountdown] = useState<number>(AUTO_RESET_SECONDS);
   const [currentTime, setCurrentTime] = useState<string>('');
+  const [currentDate, setCurrentDate] = useState<string>('');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Reloj en tiempo real
+  // Reloj digital en vivo
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
       setCurrentTime(
         now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      );
+      setCurrentDate(
+        now.toLocaleDateString('es-AR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
       );
     };
     updateClock();
@@ -51,7 +61,7 @@ export const TotemAccesoScreen: React.FC = () => {
     }, 50);
   }, []);
 
-  // Temporizador de reseteo automático
+  // Temporizador de auto-reseteo
   useEffect(() => {
     if (!result) return;
 
@@ -77,6 +87,7 @@ export const TotemAccesoScreen: React.FC = () => {
     };
   }, [result, handleClear]);
 
+  // Foco automático permanente
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -121,129 +132,62 @@ export const TotemAccesoScreen: React.FC = () => {
       result.mensaje.toLowerCase().includes('vencida'));
 
   return (
-    <div className="min-h-screen bg-gym-black text-zinc-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans selection:bg-volt selection:text-black">
-      {/* Header Limpio con Reloj */}
-      <header className="max-w-xl w-full mx-auto flex items-center justify-between pb-6 border-b border-dark-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-volt/10 border border-volt/30 flex items-center justify-center text-volt">
-            <ShieldCheck className="w-6 h-6" />
+    <div className="min-h-screen w-full bg-[#08090C] text-white flex flex-col justify-between p-6 sm:p-10 lg:p-12 font-sans selection:bg-volt selection:text-black relative overflow-hidden">
+      {/* Resplandor ambiental de fondo */}
+      <div className="pointer-events-none absolute -top-40 -left-40 w-96 h-96 bg-volt/5 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -right-40 w-96 h-96 bg-volt/5 rounded-full blur-3xl" />
+
+      {/* Header Superior Completo */}
+      <header className="w-full flex items-center justify-between pb-6 border-b border-zinc-800/80 relative z-10">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-volt/10 border border-volt/30 flex items-center justify-center text-volt shadow-lg shadow-volt/10">
+            <Dumbbell className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-white uppercase tracking-wide">
-              Control de Acceso
-            </h1>
-            <p className="text-xs text-zinc-400">
-              Validación de ingreso al gimnasio
+            <div className="flex items-center gap-2">
+              <span className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
+                Control de Ingreso
+              </span>
+              <span className="w-2 h-2 rounded-full bg-volt animate-ping" />
+            </div>
+            <p className="text-xs font-mono uppercase tracking-widest text-zinc-400 capitalize">
+              {currentDate || 'Terminal de Acceso'}
             </p>
           </div>
         </div>
 
+        {/* Reloj Digital Gigante */}
         <div className="text-right">
-          <div className="text-xl font-mono font-bold text-volt tracking-wider">
+          <div className="text-2xl sm:text-4xl font-mono font-black text-volt tracking-wider">
             {currentTime || '--:--:--'}
           </div>
-          <span className="text-[10px] uppercase font-mono tracking-widest text-zinc-500">
-            Molinete Activo
-          </span>
+          <div className="flex items-center justify-end gap-1.5 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-volt" />
+            <span className="text-[10px] font-mono tracking-widest uppercase text-zinc-500">
+              Molinete Online
+            </span>
+          </div>
         </div>
       </header>
 
-      {/* Área Central Interactiva */}
-      <main className="flex-1 flex items-center justify-center my-6">
-        <div className="w-full max-w-xl space-y-6">
-          {/* Card de Entrada y Teclado */}
-          <div className="bg-dark-surface border border-dark-border rounded-3xl p-6 sm:p-8 shadow-2xl">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <label className="block text-xs uppercase font-mono tracking-wider text-zinc-400 text-center sm:text-left">
-                Número de DNI del Socio
-              </label>
-
-              <div className="flex gap-3">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="Ej: 40123456"
-                  value={dniInput}
-                  onChange={(e) => setDniInput(e.target.value.replace(/\D/g, ''))}
-                  disabled={isLoading}
-                  className="flex-1 bg-dark-card border-2 border-dark-border rounded-2xl px-4 py-3.5 text-2xl sm:text-3xl font-extrabold tracking-widest text-white text-center focus:outline-none focus:border-volt focus:ring-4 focus:ring-volt/10 transition-all placeholder:text-zinc-700"
-                />
-
-                <Button
-                  type="submit"
-                  variant="volt"
-                  size="lg"
-                  isLoading={isLoading}
-                  disabled={!dniInput}
-                  className="px-6 rounded-2xl"
-                >
-                  <CornerDownLeft className="w-5 h-5 mr-1" />
-                  Validar
-                </Button>
-              </div>
-            </form>
-
-            {/* Teclado Numérico Táctil */}
-            <div className="mt-6 pt-6 border-t border-dark-border">
-              <p className="text-[11px] uppercase font-mono tracking-widest text-zinc-500 text-center mb-3">
-                Teclado Numérico
-              </p>
-              <div className="grid grid-cols-3 gap-2.5 max-w-xs mx-auto">
-                {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                  <button
-                    key={digit}
-                    type="button"
-                    onClick={() => handleKeypadPress(digit)}
-                    disabled={isLoading}
-                    className="h-12 rounded-xl bg-dark-card border border-dark-border text-lg font-bold text-zinc-200 hover:text-white hover:bg-zinc-800 hover:border-zinc-600 transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
-                  >
-                    {digit}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('clear')}
-                  disabled={isLoading}
-                  className="h-12 rounded-xl bg-dark-card border border-dark-border text-xs font-bold text-rose-400 hover:bg-rose-950/30 transition-colors flex items-center justify-center cursor-pointer"
-                >
-                  C
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('0')}
-                  disabled={isLoading}
-                  className="h-12 rounded-xl bg-dark-card border border-dark-border text-lg font-bold text-zinc-200 hover:text-white hover:bg-zinc-800 transition-colors flex items-center justify-center cursor-pointer"
-                >
-                  0
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('backspace')}
-                  disabled={isLoading}
-                  className="h-12 rounded-xl bg-dark-card border border-dark-border text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors flex items-center justify-center cursor-pointer"
-                  aria-label="Borrar último dígito"
-                >
-                  <Delete className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Resultado de Validación */}
-          {result && (
+      {/* Contenido Principal a Pantalla Completa (2 Columnas en Pantalla Ancha) */}
+      <main className="flex-1 w-full my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        {/* Columna Izquierda: Feedback de Estado o Mensaje de Bienvenida */}
+        <div className="lg:col-span-6 flex flex-col justify-center h-full">
+          {result ? (
+            /* Tarjeta de Resultado de Acceso (Enorme y Clara a metros de distancia) */
             <div
               className={cn(
-                'rounded-3xl p-6 border shadow-2xl transition-all duration-300 relative overflow-hidden',
+                'rounded-3xl p-8 sm:p-10 border-2 shadow-2xl transition-all duration-300 relative overflow-hidden backdrop-blur-xl',
                 result.permitido
                   ? isTolerancia
-                    ? 'bg-amber-950/30 border-amber-600/50 text-amber-200 shadow-amber-950/20'
-                    : 'bg-emerald-950/30 border-emerald-500/50 text-emerald-200 shadow-emerald-950/20'
-                  : 'bg-rose-950/30 border-rose-600/50 text-rose-200 shadow-rose-950/20'
+                    ? 'bg-amber-950/40 border-amber-500 text-amber-100 shadow-amber-950/40'
+                    : 'bg-emerald-950/40 border-emerald-400 text-emerald-100 shadow-emerald-950/40'
+                  : 'bg-rose-950/40 border-rose-500 text-rose-100 shadow-rose-950/40'
               )}
             >
-              {/* Barra de reseteo automático */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-black/40">
+              {/* Barra de progreso de auto-reseteo */}
+              <div className="absolute top-0 left-0 right-0 h-2 bg-black/60">
                 <div
                   className={cn(
                     'h-full transition-all duration-1000 ease-linear',
@@ -257,104 +201,233 @@ export const TotemAccesoScreen: React.FC = () => {
                 />
               </div>
 
-              <div className="flex items-start gap-4 pt-1">
-                <div
-                  className={cn(
-                    'w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0',
-                    result.permitido
-                      ? isTolerancia
-                        ? 'bg-amber-500/20 text-amber-400'
-                        : 'bg-emerald-500/20 text-emerald-400'
-                      : 'bg-rose-500/20 text-rose-400'
-                  )}
-                >
-                  {result.permitido ? (
-                    isTolerancia ? (
-                      <AlertTriangle className="w-7 h-7" />
+              <div className="space-y-6 pt-2">
+                {/* Icono y Badge de Estado */}
+                <div className="flex items-center gap-4">
+                  <div
+                    className={cn(
+                      'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl',
+                      result.permitido
+                        ? isTolerancia
+                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                        : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                    )}
+                  >
+                    {result.permitido ? (
+                      isTolerancia ? (
+                        <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12" />
+                      ) : (
+                        <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12" />
+                      )
                     ) : (
-                      <ShieldCheck className="w-7 h-7" />
-                    )
-                  ) : (
-                    <ShieldX className="w-7 h-7" />
-                  )}
-                </div>
+                      <XCircle className="w-10 h-10 sm:w-12 sm:h-12" />
+                    )}
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div>
                     <span
                       className={cn(
-                        'text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border',
+                        'inline-block text-xs sm:text-sm font-mono uppercase tracking-widest px-3 py-1 rounded-full border font-bold',
                         result.permitido
                           ? isTolerancia
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                          : 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       )}
                     >
                       {result.permitido
                         ? isTolerancia
-                          ? 'Acceso Permitido (En Tolerancia)'
-                          : 'Acceso Permitido'
+                          ? 'Acceso Permitido (Tolerancia)'
+                          : 'Paso Habilitado'
                         : 'Acceso Denegado'}
                     </span>
+                    <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mt-2">
+                      {result.nombreCliente || (result.permitido ? 'Bienvenido' : 'Atención')}
+                    </h2>
                   </div>
+                </div>
 
-                  <h3 className="text-xl font-bold text-white mt-1.5 truncate">
-                    {result.nombreCliente || (result.permitido ? 'Socio' : 'Atención')}
-                  </h3>
-                  <p className="text-sm opacity-90 mt-1 leading-relaxed">
+                {/* Motivo o Mensaje del Sistema */}
+                <div className="bg-black/30 border border-white/10 rounded-2xl p-5">
+                  <p className="text-base sm:text-lg font-medium opacity-95 leading-relaxed">
                     {result.mensaje}
                   </p>
+                </div>
 
-                  {/* Fechas de Vencimiento */}
-                  {(result.fechaVencimiento || result.fechaLimitePago) && (
-                    <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      {result.fechaVencimiento && (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 opacity-70" />
-                          <span>
-                            Vencimiento:{' '}
-                            <strong className="text-white">
-                              {new Date(result.fechaVencimiento).toLocaleDateString()}
-                            </strong>
-                          </span>
+                {/* Fechas de Vencimiento */}
+                {(result.fechaVencimiento || result.fechaLimitePago) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm pt-2">
+                    {result.fechaVencimiento && (
+                      <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3.5">
+                        <Calendar className="w-5 h-5 text-volt flex-shrink-0" />
+                        <div>
+                          <span className="text-zinc-400 block text-xs">Vencimiento</span>
+                          <strong className="text-white font-mono text-base">
+                            {new Date(result.fechaVencimiento).toLocaleDateString()}
+                          </strong>
                         </div>
-                      )}
-                      {result.fechaLimitePago && (
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 opacity-70" />
-                          <span>
-                            Límite de pago:{' '}
-                            <strong className="text-white">
-                              {new Date(result.fechaLimitePago).toLocaleDateString()}
-                            </strong>
-                          </span>
+                      </div>
+                    )}
+                    {result.fechaLimitePago && (
+                      <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3.5">
+                        <Clock className="w-5 h-5 text-volt flex-shrink-0" />
+                        <div>
+                          <span className="text-zinc-400 block text-xs">Límite de pago</span>
+                          <strong className="text-white font-mono text-base">
+                            {new Date(result.fechaLimitePago).toLocaleDateString()}
+                          </strong>
                         </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Botón manual de reseteo */}
-                  <div className="mt-4 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleClear}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors cursor-pointer"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Siguiente persona ({countdown}s)</span>
-                    </button>
+                      </div>
+                    )}
                   </div>
+                )}
+
+                {/* Botón de Siguiente Persona */}
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm transition-all cursor-pointer border border-white/20 active:scale-95"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    <span>Siguiente socio ({countdown}s)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Estado en Reposo (Informativo, Atractivo y Limpio) */
+            <div className="space-y-6 max-w-lg">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-volt/10 border border-volt/30 text-volt text-xs font-mono font-bold tracking-widest uppercase">
+                <Sparkles className="w-3.5 h-3.5" />
+                Molinete Automático
+              </div>
+
+              <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-none">
+                Ingresá <br />
+                <span className="text-volt">tu DNI</span>
+              </h2>
+
+              <p className="text-base sm:text-lg text-zinc-400 leading-relaxed">
+                Digitá tu número de documento en el teclado o escanealo para habilitar tu pase y registrar la asistencia.
+              </p>
+
+              <div className="pt-4 flex items-center gap-4 text-xs font-mono text-zinc-500 uppercase tracking-wider">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Cuota al día</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span>En tolerancia</span>
                 </div>
               </div>
             </div>
           )}
         </div>
+
+        {/* Columna Derecha: Entrada Numérica y Teclado Táctil de Alta Gama */}
+        <div className="lg:col-span-6 flex justify-center lg:justify-end">
+          <div className="w-full max-w-md bg-[#111217] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+            {/* Formulario y Visor Principal de DNI */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-400 px-1">
+                <span>Documento</span>
+                <span>{dniInput.length} / 8 dígitos</span>
+              </div>
+
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="••••••••"
+                  value={dniInput}
+                  onChange={(e) => setDniInput(e.target.value.replace(/\D/g, ''))}
+                  disabled={isLoading}
+                  maxLength={10}
+                  className="w-full bg-[#181920] border-2 border-zinc-700 focus:border-volt rounded-2xl py-4 px-4 text-3xl sm:text-4xl font-mono font-black tracking-[0.2em] text-center text-white placeholder:text-zinc-700 focus:outline-none focus:ring-4 focus:ring-volt/15 transition-all shadow-inner"
+                />
+              </div>
+
+              {/* Botón de Confirmación Principal */}
+              <button
+                type="submit"
+                disabled={!dniInput || isLoading}
+                className={cn(
+                  'w-full py-4 px-6 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all shadow-xl cursor-pointer active:scale-[0.98]',
+                  !dniInput || isLoading
+                    ? 'bg-zinc-800/80 text-zinc-600 border border-zinc-800 cursor-not-allowed'
+                    : 'bg-volt hover:bg-[#b8e600] text-black shadow-volt/20'
+                )}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <span>Validando estado...</span>
+                  </div>
+                ) : (
+                  <>
+                    <CornerDownLeft className="w-5 h-5 stroke-[2.5]" />
+                    <span>Habilitar Ingreso</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Teclado Táctil de Botones Grandes para Tablet */}
+            <div className="mt-6 pt-6 border-t border-zinc-800/80">
+              <div className="grid grid-cols-3 gap-3">
+                {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+                  <button
+                    key={digit}
+                    type="button"
+                    onClick={() => handleKeypadPress(digit)}
+                    disabled={isLoading}
+                    className="h-14 sm:h-16 rounded-2xl bg-[#181920] border border-zinc-800 hover:border-zinc-600 text-2xl sm:text-3xl font-mono font-bold text-zinc-100 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-sm"
+                  >
+                    {digit}
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => handleKeypadPress('clear')}
+                  disabled={isLoading}
+                  className="h-14 sm:h-16 rounded-2xl bg-[#181920] border border-zinc-800 hover:border-rose-800 text-xs font-mono font-bold text-rose-400 hover:bg-rose-950/20 transition-all active:scale-95 flex items-center justify-center cursor-pointer uppercase tracking-wider"
+                >
+                  Limpiar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleKeypadPress('0')}
+                  disabled={isLoading}
+                  className="h-14 sm:h-16 rounded-2xl bg-[#181920] border border-zinc-800 hover:border-zinc-600 text-2xl sm:text-3xl font-mono font-bold text-zinc-100 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-sm"
+                >
+                  0
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleKeypadPress('backspace')}
+                  disabled={isLoading}
+                  className="h-14 sm:h-16 rounded-2xl bg-[#181920] border border-zinc-800 hover:border-zinc-600 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center cursor-pointer"
+                  aria-label="Borrar dígito"
+                >
+                  <Delete className="w-6 h-6 stroke-[1.8]" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
-      {/* Footer Discreto */}
-      <footer className="text-center py-2 text-[11px] font-mono text-zinc-600">
-        Control de Acceso • Modo Kiosco
+      {/* Footer Fijo Minimalista */}
+      <footer className="w-full flex items-center justify-between pt-4 border-t border-zinc-800/80 text-xs font-mono text-zinc-600 relative z-10">
+        <span>GYM OS • Terminal de Acceso Permanente</span>
+        <span>Molinete #01</span>
       </footer>
     </div>
   );
