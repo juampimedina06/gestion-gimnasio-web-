@@ -74,12 +74,17 @@ export const TotemAccesoScreen: React.FC = () => {
     };
   }, [result, handleClear]);
 
-  // Foco permanente en el campo
+  // Foco permanente en el campo (siempre listo para tipear desde el teclado)
   useEffect(() => {
     inputRef.current?.focus();
+    const handleDocumentClick = () => {
+      inputRef.current?.focus();
+    };
+    document.addEventListener('click', handleDocumentClick);
+    return () => document.removeEventListener('click', handleDocumentClick);
   }, []);
 
-  // Atajos de teclado: Espacio, Enter o Escape resetean en el acto
+  // Atajos de teclado: Espacio, Enter o Escape resetean en el acto si hay resultado en pantalla
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (result) {
@@ -115,7 +120,7 @@ export const TotemAccesoScreen: React.FC = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Si hay un resultado previo, escribir limpia de inmediato y arranca el nuevo socio
+    // Si hay un resultado previo, tipear un nuevo número limpia de inmediato y arranca el nuevo DNI
     if (result) {
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
@@ -124,50 +129,21 @@ export const TotemAccesoScreen: React.FC = () => {
     setDniInput(e.target.value.replace(/\D/g, ''));
   };
 
-  const handleKeypadPress = (val: string) => {
-    // Si hay un resultado previo, tocar cualquier número limpia y setea ese número de una vez
-    if (result) {
-      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
-      setResult(null);
-
-      if (val === 'clear' || val === 'backspace') {
-        setDniInput('');
-      } else {
-        setDniInput(val);
-      }
-      inputRef.current?.focus();
-      return;
-    }
-
-    if (val === 'backspace') {
-      setDniInput((prev) => prev.slice(0, -1));
-    } else if (val === 'clear') {
-      setDniInput('');
-    } else {
-      if (dniInput.length < 10) {
-        setDniInput((prev) => prev + val);
-      }
-    }
-    inputRef.current?.focus();
-  };
-
   const isTolerancia =
     result?.permitido &&
     (result.mensaje.toLowerCase().includes('tolerancia') ||
       result.mensaje.toLowerCase().includes('vencida'));
 
   return (
-    <div className="h-screen w-screen bg-[#07080A] text-white flex flex-col justify-between p-4 sm:p-8 lg:p-10 font-sans selection:bg-volt selection:text-black overflow-hidden relative">
+    <div className="h-screen w-screen bg-[#07080A] text-white flex flex-col justify-between p-6 sm:p-10 lg:p-12 font-sans selection:bg-volt selection:text-black overflow-hidden relative">
       {/* Luz ambiental sutil en esquinas */}
       <div className="pointer-events-none absolute -top-32 -left-32 w-80 h-80 bg-volt/5 rounded-full blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 w-80 h-80 bg-volt/5 rounded-full blur-3xl" />
 
-      {/* Header Superior Limpio y Arquitectónico */}
-      <header className="w-full flex items-center justify-between pb-4 border-b border-zinc-800/60 relative z-10 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          {/* Isotipo geométrico minimalista en lugar de emoji/icono genérico */}
-          <div className="w-9 h-9 rounded-xl bg-volt flex items-center justify-center text-black font-black text-sm tracking-tighter shadow-lg shadow-volt/20">
+      {/* Header Superior Limpio */}
+      <header className="w-full flex items-center justify-between pb-6 border-b border-zinc-800/60 relative z-10 flex-shrink-0">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-volt flex items-center justify-center text-black font-black text-sm tracking-tighter shadow-lg shadow-volt/20">
             GYM
           </div>
           <div>
@@ -183,7 +159,7 @@ export const TotemAccesoScreen: React.FC = () => {
         {/* Reloj y Estado */}
         <div className="flex items-center gap-6">
           <div className="text-right">
-            <div className="text-xl sm:text-2xl font-mono font-bold text-volt tracking-wider">
+            <div className="text-xl sm:text-3xl font-mono font-bold text-volt tracking-wider">
               {currentTime || '--:--:--'}
             </div>
             <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 capitalize">
@@ -198,9 +174,9 @@ export const TotemAccesoScreen: React.FC = () => {
       </header>
 
       {/* Cuerpo Central Inmersivo (Grid 2 Columnas) */}
-      <main className="flex-1 w-full my-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch min-h-0 relative z-10">
+      <main className="flex-1 w-full my-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch min-h-0 relative z-10">
         {/* Columna Izquierda: Imagen Heroica Cinematográfica con Overlay de Estado */}
-        <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-zinc-800/80 shadow-2xl flex flex-col justify-between p-6 sm:p-10 bg-zinc-950">
+        <div className="lg:col-span-7 relative rounded-3xl overflow-hidden border border-zinc-800/80 shadow-2xl flex flex-col justify-between p-8 sm:p-12 bg-zinc-950">
           {/* Fondo Fotográfico Cinematográfico */}
           <div
             className="absolute inset-0 bg-cover bg-center transition-all duration-700 filter brightness-[0.45] contrast-[1.1]"
@@ -211,20 +187,20 @@ export const TotemAccesoScreen: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-[#07080A] via-[#07080A]/60 to-transparent" />
           <div className="absolute inset-0 bg-radial-gradient from-transparent to-[#07080A]/80" />
 
-          {/* Contenido Superior Izquierdo */}
+          {/* Tag Superior */}
           <div className="relative z-10">
-            <span className="inline-block px-3 py-1 rounded-full bg-black/60 border border-white/10 text-[11px] font-mono uppercase tracking-[0.25em] text-zinc-300 backdrop-blur-md">
+            <span className="inline-block px-3.5 py-1.5 rounded-full bg-black/60 border border-white/10 text-[11px] font-mono uppercase tracking-[0.25em] text-zinc-300 backdrop-blur-md">
               Pase Digital
             </span>
           </div>
 
-          {/* Contenido Inferior Izquierdo: Estado o Bienvenida */}
+          {/* Estado o Bienvenida */}
           <div className="relative z-10">
             {result ? (
               /* Tarjeta de Confirmación de Acceso */
               <div
                 className={cn(
-                  'rounded-2xl p-6 sm:p-8 border backdrop-blur-xl shadow-2xl transition-all duration-300 relative overflow-hidden',
+                  'rounded-3xl p-8 sm:p-10 border backdrop-blur-2xl shadow-2xl transition-all duration-300 relative overflow-hidden',
                   result.permitido
                     ? isTolerancia
                       ? 'bg-amber-950/70 border-amber-500/80 text-amber-100'
@@ -233,7 +209,7 @@ export const TotemAccesoScreen: React.FC = () => {
                 )}
               >
                 {/* Línea de reseteo automático */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-black/40">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-black/50">
                   <div
                     className={cn(
                       'h-full transition-all duration-1000 ease-linear',
@@ -251,7 +227,7 @@ export const TotemAccesoScreen: React.FC = () => {
                 <div className="flex items-center justify-between mb-3 pt-1">
                   <span
                     className={cn(
-                      'text-xs font-mono font-bold uppercase tracking-widest px-3 py-1 rounded-full border',
+                      'text-xs font-mono font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full border',
                       result.permitido
                         ? isTolerancia
                           ? 'bg-amber-400/20 text-amber-300 border-amber-400/40'
@@ -265,7 +241,7 @@ export const TotemAccesoScreen: React.FC = () => {
                         : 'Paso Habilitado'
                       : 'Acceso Denegado'}
                   </span>
-                  <span className="text-[11px] font-mono opacity-60">
+                  <span className="text-xs font-mono opacity-60">
                     Auto-limpieza en {countdown}s
                   </span>
                 </div>
@@ -276,29 +252,29 @@ export const TotemAccesoScreen: React.FC = () => {
                 </h2>
 
                 {/* Mensaje Oficial */}
-                <p className="text-sm sm:text-base mt-2 font-normal opacity-90 leading-relaxed">
+                <p className="text-base sm:text-lg mt-3 font-normal opacity-90 leading-relaxed">
                   {result.mensaje}
                 </p>
 
                 {/* Fechas de Vencimiento */}
                 {(result.fechaVencimiento || result.fechaLimitePago) && (
-                  <div className="mt-5 pt-4 border-t border-white/10 grid grid-cols-2 gap-3 text-xs font-mono">
+                  <div className="mt-6 pt-5 border-t border-white/10 grid grid-cols-2 gap-4 text-xs font-mono">
                     {result.fechaVencimiento && (
-                      <div className="bg-black/40 border border-white/5 rounded-xl p-3">
-                        <span className="text-zinc-400 block text-[10px] uppercase tracking-wider">
+                      <div className="bg-black/40 border border-white/5 rounded-2xl p-4">
+                        <span className="text-zinc-400 block text-[11px] uppercase tracking-wider mb-1">
                           Vencimiento
                         </span>
-                        <strong className="text-white text-sm sm:text-base font-bold">
+                        <strong className="text-white text-base sm:text-lg font-bold">
                           {new Date(result.fechaVencimiento).toLocaleDateString()}
                         </strong>
                       </div>
                     )}
                     {result.fechaLimitePago && (
-                      <div className="bg-black/40 border border-white/5 rounded-xl p-3">
-                        <span className="text-zinc-400 block text-[10px] uppercase tracking-wider">
+                      <div className="bg-black/40 border border-white/5 rounded-2xl p-4">
+                        <span className="text-zinc-400 block text-[11px] uppercase tracking-wider mb-1">
                           Límite de pago
                         </span>
-                        <strong className="text-white text-sm sm:text-base font-bold">
+                        <strong className="text-white text-base sm:text-lg font-bold">
                           {new Date(result.fechaLimitePago).toLocaleDateString()}
                         </strong>
                       </div>
@@ -307,104 +283,90 @@ export const TotemAccesoScreen: React.FC = () => {
                 )}
               </div>
             ) : (
-              /* Mensaje de Reposo Inspirador y Limpio */
-              <div className="space-y-3">
+              /* Mensaje de Reposo Limpio */
+              <div className="space-y-4">
                 <span className="text-xs font-mono uppercase tracking-[0.2em] text-volt block">
                   Autenticación de Asistencia
                 </span>
-                <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight uppercase leading-tight">
+                <h2 className="text-4xl sm:text-6xl font-black text-white tracking-tight uppercase leading-tight">
                   Entrená <br />
                   <span className="text-volt">sin límites.</span>
                 </h2>
-                <p className="text-xs sm:text-sm text-zinc-400 max-w-md leading-relaxed font-light">
-                  Ingresá tu DNI en el panel numérico para habilitar el pase y registrar tu ingreso al gimnasio.
+                <p className="text-sm sm:text-base text-zinc-400 max-w-md leading-relaxed font-light">
+                  Escribí tu DNI en el teclado numérico físico y presioná Enter para habilitar tu pase.
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Columna Derecha: Panel Táctil de Ingreso de DNI */}
+        {/* Columna Derecha: Entrada de Teclado Físico (Sin botones numéricos en pantalla) */}
         <div className="lg:col-span-5 flex flex-col justify-center">
-          <div className="bg-[#101116] border border-zinc-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl flex flex-col justify-between">
-            {/* Input de DNI y Botón Principal */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-widest text-zinc-400 px-1">
-                <span>Número de DNI</span>
-                <span className="text-zinc-600">{dniInput.length} / 8</span>
+          <div className="bg-[#101116] border border-zinc-800/90 rounded-3xl p-8 sm:p-12 shadow-2xl backdrop-blur-xl flex flex-col justify-center space-y-8">
+            <div className="space-y-2">
+              <span className="text-xs font-mono uppercase tracking-[0.2em] text-volt">
+                Ingreso por Teclado
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+                Ingresá tu DNI
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed">
+                El sistema detecta automáticamente tu teclado físico o lector de código.
+              </p>
+            </div>
+
+            {/* Formulario y Visor Principal de DNI */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono uppercase tracking-widest text-zinc-400 px-1">
+                  <span>Documento</span>
+                  <span className="text-zinc-600">{dniInput.length} / 8 dígitos</span>
+                </div>
+
+                {/* Visor Numérico de Gran Escala */}
+                <div className="relative">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="••••••••"
+                    value={dniInput}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    maxLength={10}
+                    className="w-full bg-[#161720] border-2 border-zinc-800 focus:border-volt rounded-2xl py-6 px-4 text-4xl sm:text-5xl font-mono font-black tracking-[0.25em] text-center text-white placeholder:text-zinc-800 focus:outline-none focus:ring-4 focus:ring-volt/15 transition-all shadow-inner"
+                  />
+                </div>
               </div>
 
-              {/* Visor Numérico */}
-              <div className="relative">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="••••••••"
-                  value={dniInput}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                  maxLength={10}
-                  className="w-full bg-[#161720] border-2 border-zinc-800 focus:border-volt rounded-2xl py-4 px-4 text-3xl sm:text-4xl font-mono font-black tracking-[0.25em] text-center text-white placeholder:text-zinc-800 focus:outline-none focus:ring-4 focus:ring-volt/10 transition-all shadow-inner"
-                />
-              </div>
-
-              {/* Botón de Confirmar Ingreso */}
+              {/* Botón de Confirmar / Enter */}
               <button
                 type="submit"
                 disabled={!dniInput || isLoading}
                 className={cn(
-                  'w-full py-4 px-6 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-[0.15em] transition-all shadow-lg active:scale-[0.98] cursor-pointer',
+                  'w-full py-5 px-6 rounded-2xl font-black text-sm uppercase tracking-[0.15em] transition-all shadow-xl active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2',
                   !dniInput || isLoading
                     ? 'bg-zinc-800/60 text-zinc-600 border border-zinc-800/80 cursor-not-allowed'
                     : 'bg-volt hover:bg-[#b8e600] text-black shadow-volt/20'
                 )}
               >
-                {isLoading ? 'Verificando estado...' : 'Habilitar Ingreso'}
+                {isLoading ? (
+                  <span>Verificando estado...</span>
+                ) : (
+                  <span>Presioná Enter para Validar</span>
+                )}
               </button>
             </form>
 
-            {/* Teclado Táctil Industrial de Alta Sensibilidad */}
-            <div className="mt-6 pt-5 border-t border-zinc-800/80">
-              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-                {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
-                  <button
-                    key={digit}
-                    type="button"
-                    onClick={() => handleKeypadPress(digit)}
-                    disabled={isLoading}
-                    className="h-13 sm:h-15 rounded-2xl bg-[#161720] border border-zinc-800 hover:border-zinc-600 text-xl sm:text-2xl font-mono font-bold text-zinc-100 hover:text-white hover:bg-zinc-800/80 transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-sm select-none"
-                  >
-                    {digit}
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('clear')}
-                  disabled={isLoading}
-                  className="h-13 sm:h-15 rounded-2xl bg-[#161720] border border-zinc-800 hover:border-rose-800 text-[11px] font-mono font-bold text-rose-400 hover:bg-rose-950/20 transition-all active:scale-95 flex items-center justify-center cursor-pointer uppercase tracking-wider select-none"
-                >
-                  Borrar
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('0')}
-                  disabled={isLoading}
-                  className="h-13 sm:h-15 rounded-2xl bg-[#161720] border border-zinc-800 hover:border-zinc-600 text-xl sm:text-2xl font-mono font-bold text-zinc-100 hover:text-white hover:bg-zinc-800/80 transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-sm select-none"
-                >
-                  0
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleKeypadPress('backspace')}
-                  disabled={isLoading}
-                  className="h-13 sm:h-15 rounded-2xl bg-[#161720] border border-zinc-800 hover:border-zinc-600 text-xs font-mono font-bold text-zinc-400 hover:text-white hover:bg-zinc-800/80 transition-all active:scale-95 flex items-center justify-center cursor-pointer uppercase tracking-wider select-none"
-                >
-                  ←
-                </button>
+            {/* Atajos y Ayuda de Teclado */}
+            <div className="pt-6 border-t border-zinc-800/80 grid grid-cols-2 gap-3 text-center">
+              <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800 text-[11px] font-mono text-zinc-400">
+                <span className="font-bold text-white block mb-0.5">Enter</span>
+                <span>Confirmar DNI</span>
+              </div>
+              <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800 text-[11px] font-mono text-zinc-400">
+                <span className="font-bold text-white block mb-0.5">Espacio / Esc</span>
+                <span>Limpiar pantalla</span>
               </div>
             </div>
           </div>
@@ -412,9 +374,9 @@ export const TotemAccesoScreen: React.FC = () => {
       </main>
 
       {/* Footer Fijo Minimalista */}
-      <footer className="w-full flex items-center justify-between pt-3 border-t border-zinc-800/60 text-[10px] font-mono uppercase tracking-widest text-zinc-600 relative z-10 flex-shrink-0">
-        <span>GYM OS • Terminal de Acceso</span>
-        <span>Molinete #01</span>
+      <footer className="w-full flex items-center justify-between pt-4 border-t border-zinc-800/60 text-[10px] font-mono uppercase tracking-widest text-zinc-600 relative z-10 flex-shrink-0">
+        <span>GYM OS • Terminal de Molinete Físico</span>
+        <span>Acceso #01</span>
       </footer>
     </div>
   );
