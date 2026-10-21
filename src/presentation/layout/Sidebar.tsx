@@ -115,7 +115,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="p-4 border-t border-dark-border bg-dark-surface">
           <div className="p-3 rounded-xl bg-dark-card border border-dark-border mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-volt">
+              <div
+                className={cn(
+                  'w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs border',
+                  isAdmin
+                    ? 'bg-volt/10 border-volt/30 text-volt shadow-[0_0_8px_rgba(204,255,0,0.1)]'
+                    : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.1)]'
+                )}
+              >
                 {user?.nombre?.[0]}
                 {user?.apellido?.[0]}
               </div>
@@ -126,12 +133,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span
                     className={cn(
-                      'inline-block w-1.5 h-1.5 rounded-full',
+                      'inline-block w-2 h-2 rounded-full',
                       isAdmin ? 'bg-volt' : 'bg-cyan-400'
                     )}
                   />
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-400">
-                    {isAdmin ? 'Admin' : 'Trainer'}
+                  <span
+                    className={cn(
+                      'text-[10px] uppercase font-mono font-bold tracking-wider',
+                      isAdmin ? 'text-volt' : 'text-cyan-400'
+                    )}
+                  >
+                    {isAdmin ? 'Administrador' : 'Personal Trainer'}
                   </span>
                 </div>
               </div>
