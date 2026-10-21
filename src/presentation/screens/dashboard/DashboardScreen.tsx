@@ -1,8 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Search,
-  ShieldCheck,
   UserPlus,
   RotateCcw,
   CreditCard,
@@ -20,7 +18,6 @@ import {
 } from '../../utils/formatters';
 
 export const DashboardScreen: React.FC = () => {
-  const navigate = useNavigate();
   const { data: clientes = [], isLoading, refetch } = useClientes();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,16 +86,6 @@ export const DashboardScreen: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/ingreso')}
-            className="text-xs"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-volt" />
-            Molinete
-          </Button>
-
           <Button
             variant="secondary"
             size="sm"

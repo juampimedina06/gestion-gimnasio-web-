@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
-  ShieldCheck,
   Users,
   UserCheck,
   Dumbbell,
@@ -27,12 +26,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       label: 'Panel Principal',
       to: '/dashboard',
       icon: LayoutDashboard,
-      adminOnly: false,
-    },
-    {
-      label: 'Control de Acceso',
-      to: '/ingreso',
-      icon: ShieldCheck,
       adminOnly: false,
     },
     {
