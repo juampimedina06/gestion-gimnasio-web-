@@ -389,7 +389,7 @@ export const DashboardScreen: React.FC = () => {
         {/* Columna Derecha: Telemetría y Widgets Personalizados del Gimnasio (4 cols en XL) */}
         <div className="xl:col-span-4 2xl:col-span-3 space-y-5">
           {/* Widget 1: Monitor de Sala y Kiosk */}
-          <div className="bg-dark-surface border border-dark-border rounded-2xl p-4.5 space-y-4 shadow-lg">
+          <div className="bg-dark-surface border border-dark-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-lg">
             <div className="flex items-center justify-between pb-3 border-b border-dark-border">
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-volt" />
@@ -442,7 +442,7 @@ export const DashboardScreen: React.FC = () => {
           </div>
 
           {/* Widget 2: Distribución de Membresías */}
-          <div className="bg-dark-surface border border-dark-border rounded-2xl p-4.5 space-y-4 shadow-lg">
+          <div className="bg-dark-surface border border-dark-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-lg">
             <div className="flex items-center gap-2 pb-3 border-b border-dark-border">
               <Dumbbell className="w-4 h-4 text-cyan-400" />
               <span className="font-bold text-xs uppercase tracking-wider text-white">
@@ -497,7 +497,7 @@ export const DashboardScreen: React.FC = () => {
 
           {/* Widget 3: Acceso Directo por Rol */}
           {isAdmin ? (
-            <div className="bg-dark-surface border border-dark-border rounded-2xl p-4.5 space-y-3 shadow-lg">
+            <div className="bg-dark-surface border border-dark-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-lg">
               <div className="flex items-center gap-2 pb-2 border-b border-dark-border">
                 <ShieldCheck className="w-4 h-4 text-volt" />
                 <span className="font-bold text-xs uppercase tracking-wider text-white">
@@ -519,7 +519,7 @@ export const DashboardScreen: React.FC = () => {
               </Link>
             </div>
           ) : (
-            <div className="bg-dark-surface border border-dark-border rounded-2xl p-4.5 space-y-3 shadow-lg">
+            <div className="bg-dark-surface border border-dark-border rounded-2xl p-5 sm:p-6 space-y-4 shadow-lg">
               <div className="flex items-center gap-2 pb-2 border-b border-dark-border">
                 <Activity className="w-4 h-4 text-cyan-400" />
                 <span className="font-bold text-xs uppercase tracking-wider text-white">
